@@ -93,17 +93,17 @@ This can be easily converted to a component.
 @inject NavigationManager NavigationManager
 
 <CascadingValue Value="Location" Name="Location">
-    @ChildComponents
+    @ChildContent
 </CascadingValue>
 
 @code {
     private string? Location { get; set; }
 
-    [Parameter] public RenderFragment? ChildComponents { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
 
     protected override void OnInitialized()
     {
-        Location = new Uri(NavigationManager.Uri).PathAndQuery;
+        Location = NavigationManager.Uri;
         NavigationManager.LocationChanged += LocationChanged;
     }
 
@@ -111,7 +111,7 @@ This can be easily converted to a component.
         object sender,
         Microsoft.AspNetCore.Components.Routing.LocationChangedEventArgs args)
     {
-        Location = new Uri(args.Location).PathAndQuery;
+        Location = args.Location;
         StateHasChanged();
     }
 }
