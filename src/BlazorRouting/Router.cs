@@ -34,6 +34,8 @@ namespace BlazorRouting
 
         private bool _onNavigateCalled = false;
 
+        private Type? _lastRender = null;
+
         [Inject] private NavigationManager? NavigationManager { get; set; }
 
         [Inject] private INavigationInterception? NavigationInterception { get; set; }
@@ -169,8 +171,9 @@ namespace BlazorRouting
 
             var match = RouteContainer?.TryMatch(locationPath);
 
-            if (match?.IsSuccess ?? false)
+            if (match?.IsSuccess ?? false && _lastRender != match.Value.RouteEntry.Handler)
             {
+                _lastRender = match!.Value.RouteEntry!.Handler;
                 if (!typeof(IComponent).IsAssignableFrom(match.Value.RouteEntry?.Handler))
                 {
                     throw new InvalidOperationException($"The type {match.Value.RouteEntry?.Handler!.FullName} " +
