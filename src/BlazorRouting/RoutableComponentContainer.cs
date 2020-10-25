@@ -14,7 +14,7 @@ namespace TechDebtRadar.App.Client.Shared
         protected override void OnInitialized()
         {
             Location = NavigationManager!.Uri;
-            NavigationManager!.LocationChanged += LocationChanged;
+            NavigationManager!.LocationChanged += LocationChanged!;
         }
 
         private void LocationChanged(

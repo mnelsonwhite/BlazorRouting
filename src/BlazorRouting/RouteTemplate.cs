@@ -23,20 +23,14 @@ namespace BlazorRouting
         public int OptionalSegmentsCount { get; }
         public bool ContainsCatchAllSegment { get; }
 
-        public bool Equals(RouteTemplate other)
-        {
-            return string.Equals(TemplateText, other.TemplateText, StringComparison.OrdinalIgnoreCase);
-        }
+        public bool Equals(RouteTemplate? other) => string.Equals(
+            TemplateText,
+            other?.TemplateText,
+            StringComparison.OrdinalIgnoreCase
+        );
 
-        public override int GetHashCode()
-        {
-            return HashCode.Combine(TemplateText);
-        }
-
-        public override bool Equals(object obj)
-        {
-            return obj is RouteTemplate template && Equals(template);
-        }
+        public override int GetHashCode() => HashCode.Combine(TemplateText);
+        public override bool Equals(object? obj) => obj is RouteTemplate template && Equals(template);
     }
 
 }

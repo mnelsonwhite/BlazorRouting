@@ -8,7 +8,7 @@ namespace BlazorRouting
 {
     public class RouteEntry : IComparable<RouteEntry>, IEquatable<RouteEntry>
     {
-        private static readonly char[] Separator = new[] { '/' };
+        private static readonly char Separator = '/';
 
         public RouteEntry(RouteTemplate template, string[] unusedRouteParameterNames)
         {
@@ -19,11 +19,10 @@ namespace BlazorRouting
         public RouteTemplate Template { get; }
         public string[] UnusedRouteParameterNames { get; }
 
-        public Result<Dictionary<string, object?>> Match(string path)
+        public bool TryMatch(string path, out Dictionary<string, object?> parameters)
         {
-            var failed = Result<Dictionary<string, object?>>
-                .Failed(new Dictionary<string, object?>(), $"No matching route for path {path}");
-            var segments = path.Trim('/').Split(Separator, StringSplitOptions.RemoveEmptyEntries);
+            parameters = new Dictionary<string, object?>();
+            var segments = path.Trim(Separator).Split(Separator, StringSplitOptions.RemoveEmptyEntries);
             // Individual segments are URL-decoded in order to support arbitrary characters, assuming UTF-8 encoding.
             for (int i = 0; i < segments.Length; i++)
             {
@@ -38,18 +37,18 @@ namespace BlazorRouting
             // PathSegments:    /foo/bar/one/two/three
             if (Template.ContainsCatchAllSegment && segments.Length >= Template.Segments.Length)
             {
-                catchAllValue = string.Join('/', segments[Range.StartAt(Template.Segments.Length - 1)]);
+                catchAllValue = string.Join(Separator, segments[Range.StartAt(Template.Segments.Length - 1)]);
             }
             // If there are no optional segments on the route and the length of the route
             // and the template do not match, then there is no chance of this matching and
             // we can bail early.
             else if (Template.OptionalSegmentsCount == 0 && Template.Segments.Length != segments.Length)
             {
-                return failed;
+                return false;
             }
 
             // Parameters will be lazily initialized.
-            Dictionary<string, object?>? parameters = null;
+            //Dictionary<string, object?>? parameters = null;
             var numMatchingSegments = 0;
             for (var i = 0; i < Template.Segments.Length; i++)
             {
@@ -89,7 +88,7 @@ namespace BlazorRouting
 
                 if (pathSegment == null || !segment.Match(pathSegment, out var matchedParameterValue))
                 {
-                    return failed;
+                    return false;
                 }
                 else
                 {
@@ -137,10 +136,11 @@ namespace BlazorRouting
             var allNonOptionalSegmentsMatch = numMatchingSegments >= (Template.Segments.Length - Template.OptionalSegmentsCount);
             if (Template.ContainsCatchAllSegment || (allRouteSegmentsMatch && allNonOptionalSegmentsMatch))
             {
-                return Result<Dictionary<string, object?>>.Success(parameters ?? new Dictionary<string, object?>());
+
+                return true;
             }
 
-            return failed;
+            return false;
         }
 
         /// <summary>
@@ -172,7 +172,7 @@ namespace BlazorRouting
         /// * For parameters with different numbers of constraints, the one with more wins
         /// If we get to the end of the comparison routing we've detected an ambiguous pair of routes.
         /// </summary>
-        public int CompareTo(RouteEntry other)
+        public int CompareTo(RouteEntry? other)
         {
             if (ReferenceEquals(this, other))
             {
@@ -180,10 +180,10 @@ namespace BlazorRouting
             }
 
             var xTemplate = Template;
-            var yTemplate = other.Template;
-            if (xTemplate.Segments.Length != other.Template.Segments.Length)
+            var yTemplate = other!.Template;
+            if (xTemplate.Segments.Length != other?.Template.Segments.Length)
             {
-                return xTemplate.Segments.Length < other.Template.Segments.Length ? -1 : 1;
+                return xTemplate.Segments.Length < other?.Template.Segments.Length ? -1 : 1;
             }
             else
             {
@@ -236,19 +236,10 @@ namespace BlazorRouting
             }
         }
 
-        public override int GetHashCode()
-        {
-            return HashCode.Combine(Template);
-        }
+        public override int GetHashCode() => HashCode.Combine(Template);
 
-        public override bool Equals(object? obj)
-        {
-            return obj is RouteEntry entry && Equals(entry);
-        }
+        public override bool Equals(object? obj) => obj is RouteEntry entry && Equals(entry);
 
-        public bool Equals(RouteEntry other)
-        {
-            return Template.Equals(other);
-        }
+        public bool Equals(RouteEntry? other) => Template.Equals(other);
     }
 }

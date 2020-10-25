@@ -5,7 +5,7 @@ I wanted to be able to deep link into my application but all the useful routing 
 
 The objectives were to:
  1. Parse the browser location string to be able to activate components within the application instead of just 'pages'. This allowed routing the side-panels, etc.
- 2. Use 'catch-all' routes to allow sub-routes to be handled by specific pages. Although the catch-all route was implemented in the current [aspnetcore](https://github.com/dotnet/aspnetcore) repository, it didn't appear to be present in the releases or any of the documentation.
+ 2. Use 'catch-all' routes to allow sub-routes to be handled by specific pages. Although the catch-all route is only implemented in the current .Net 5.0.
 
 The microsoft implementation for the `RouteContext` mutated the state of the context instance over multiple `RouteEntry` match invocations, but only the first match appears to ever be used. The implementation has be refactored to allow matching a `RouteEntry` and either using the handler specified in the entry or just taking some action. I had implemented a generic `RouteEntry` because some of the earlier iterations involved creating a entry with a delegate callback.
 
@@ -74,7 +74,7 @@ Optionally override `OnActivate` or `OnActivateAsync` to perform an action once 
 
 Reference the library and replace the `Router` used in `App.Razor`. The same syntax is used. The `RoutedComponentBase` expects a cascading value called `Location`. The can be provided many different ways, but if the whole application has access to this cascading value. The `Location` is the current browser location.
 
-``` razor
+``` blazor
 <CascadingValue Value="Location" Name="Location">
     <Router AppAssembly="@typeof(Program).Assembly">
         ...

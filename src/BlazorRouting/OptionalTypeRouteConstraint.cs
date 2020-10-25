@@ -8,13 +8,13 @@ namespace BlazorRouting
     /// type.
     /// </summary>
     /// <typeparam name="T">The type to which the value must be parseable.</typeparam>
-    internal class OptionalTypeRouteConstraint<T> : RouteConstraint
+    public class OptionalTypeRouteConstraint<T> : RouteConstraint
     {
         public delegate bool TryParseDelegate(string str, out T result);
 
         private readonly TryParseDelegate _parser;
 
-        public OptionalTypeRouteConstraint(TryParseDelegate parser)
+        internal OptionalTypeRouteConstraint(TryParseDelegate parser)
         {
             _parser = parser;
         }

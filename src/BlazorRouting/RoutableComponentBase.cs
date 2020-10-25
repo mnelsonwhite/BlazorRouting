@@ -23,7 +23,7 @@ namespace TechDebtRadar.App.Client.Shared
                 var routeTemplate = TemplateParser.ParseTemplate(Route);
                 RouteEntry = new RouteEntry(
                     routeTemplate,
-                    new string[0]
+                    Array.Empty<string>()
                 );
             }
         }
@@ -33,39 +33,26 @@ namespace TechDebtRadar.App.Client.Shared
             if (RouteEntry == null || Location == null) return;
 
             var path = new Uri(Location).PathAndQuery;
-            var match = RouteEntry.Match(path);
 
-            if (match.IsSuccess)
+            if (Active = RouteEntry.TryMatch(path, out var parameters))
             {
-                await OnActivateAsync(match.Value);
-                OnActivate(match.Value);
+                await OnActivateAsync(parameters);
+                OnActivate(parameters);
             }
             else
             {
                 await OnDeactivateAsync();
                 OnDeactivate();
             }
-
-            Active = match.IsSuccess;
         }
 
-        protected virtual Task OnActivateAsync(Dictionary<string, object?> parameters)
-        {
-            return Task.CompletedTask;
-        }
+        protected virtual Task OnActivateAsync(Dictionary<string, object?> parameters) => Task.CompletedTask;
 
-        protected virtual void OnActivate(Dictionary<string, object?> parameters)
-        {
-        }
+        protected virtual void OnActivate(Dictionary<string, object?> parameters) { }
 
-        protected virtual Task OnDeactivateAsync()
-        {
-            return Task.CompletedTask;
-        }
+        protected virtual Task OnDeactivateAsync() => Task.CompletedTask;
 
-        protected virtual void OnDeactivate()
-        {
-        }
+        protected virtual void OnDeactivate() { }
     }
 }
 
