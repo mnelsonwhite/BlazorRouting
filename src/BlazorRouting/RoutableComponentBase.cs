@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Components;
 using BlazorRouting;
 using System;
 
-namespace TechDebtRadar.App.Client.Shared
+namespace BlazorRouting
 {
     public abstract class RoutableComponentBase : ComponentBase
     {
