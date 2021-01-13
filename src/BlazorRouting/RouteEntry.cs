@@ -22,7 +22,10 @@ namespace BlazorRouting
         public bool TryMatch(string path, out Dictionary<string, object?> parameters)
         {
             parameters = new Dictionary<string, object?>();
-            var segments = path.Trim(Separator).Split(Separator, StringSplitOptions.RemoveEmptyEntries);
+
+            // Want to ignore query string if present, as route matching shouldn't be affected by it.
+            var querylessString = path.Split('?')[0];
+            var segments = querylessString.Trim(Separator).Split(Separator, StringSplitOptions.RemoveEmptyEntries);
             // Individual segments are URL-decoded in order to support arbitrary characters, assuming UTF-8 encoding.
             for (int i = 0; i < segments.Length; i++)
             {
