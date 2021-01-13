@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Components.Rendering;
 using Microsoft.AspNetCore.Components.Routing;
 
-namespace TechDebtRadar.App.Client.Shared
+namespace BlazorRouting
 {
     public class RoutableComponentContainer : ComponentBase
     {
